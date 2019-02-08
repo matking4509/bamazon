@@ -11,21 +11,34 @@ var connection = mysql.createConnection({
 });
 
 // Make MySQL Connection
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId);
-    displayAllItems();
-});
+function main() {
+    return new Promise(function(resolve, reject) {
+        connection.connect(function (err) {
+            if (err) throw err;
+            console.log("connected as id " + connection.threadId);
+        });
+    });
+};
+
+main()
+.then(displayAllItems)
+.then(itemBuy)
+
+
 
 function itemBuy() {
     inquirer
         .prompt([
-            {   type: "input",
+            {
+                type: "input",
                 message: "What is the ID of the Item you'd like to purchase?",
-                name: "itemId" },
-            {   type: "input",
+                name: "itemId"
+            },
+            {
+                type: "input",
                 message: "How many of these would you like?",
-                name: "itemQty"},
+                name: "itemQty"
+            },
         ]).then(function(answers) {
             // console.log("answers",answers);
             connection.query("SELECT * FROM product where item_id = " + answers.itemId, function (err, data) {
@@ -44,7 +57,7 @@ function itemBuy() {
                         console.log("\nYou have purchased " + answers.itemQty + " \"" + itemName + "\" for $" + totalCost + " there are " + remain + " left.");
                     });
                 };
-                connection.end(); // Why Here?! 
+                connection.end();
             });
         });
 
@@ -59,6 +72,5 @@ function displayAllItems() {
             output += `\n${elem.item_id}:\t${elem.product_name} - ${elem.price}`
         });
         console.log(output);
-        itemBuy()
     });
 }
