@@ -21,7 +21,8 @@ function main() {
 };
 
 main()
-.then(displayAllItems)
+.then(getAllItems)
+.then(displayData)
 .then(itemBuy)
 
 
@@ -64,13 +65,23 @@ function itemBuy() {
 }
 
 // Display 
-function displayAllItems() {
+function getAllItems() {
+    return new Promise(resolve, reject) {
+        connection.query("SELECT * FROM product", function (err, data) {
+            if (err) reject(err);
+            
+            resolve(data);
+            data.forEach(function (elem) {
+                output += `\n${elem.item_id}:\t${elem.product_name} - ${elem.price}`
+            });
+        });   
+    }
+}
+
+function displayData(data) {
     output = '';
-    connection.query("SELECT * FROM product", function (err, data) {
-        if (err) throw err;
-        data.forEach(function (elem) {
-            output += `\n${elem.item_id}:\t${elem.product_name} - ${elem.price}`
-        });
-        console.log(output);
+    data.forEach(function (elem) {
+        output += `\n${elem.item_id}:\t${elem.product_name} - ${elem.price}`
     });
+    console.log(output);
 }
